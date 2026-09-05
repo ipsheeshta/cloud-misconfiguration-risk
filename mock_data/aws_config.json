@@ -1,0 +1,61 @@
+{
+    "security_groups": [
+        {
+            "id": "sg-001",
+            "name": "web-server-sg",
+            "protocol": "tcp",
+            "port": 22,
+            "source": "0.0.0.0/0"
+        },
+        {
+            "id": "sg-002",
+            "name": "remote-access-sg",
+            "protocol": "tcp",
+            "port": 3389,
+            "source": "0.0.0.0/0"
+        },
+        {
+            "id": "sg-003",
+            "name": "application-sg",
+            "protocol": "tcp",
+            "port": 8080,
+            "source": "0.0.0.0/0"
+        }
+    ],
+
+    "s3": [
+        {
+            "name": "company-public-data",
+            "public_access": true,
+            "public_object_access": true,
+            "encryption_enabled": false
+        },
+        {
+            "name": "private-backups",
+            "public_access": false,
+            "public_object_access": false,
+            "encryption_enabled": true
+        }
+    ],
+
+    "iam": [
+        {
+            "type": "policy",
+            "name": "AdminPolicy",
+            "effect": "Allow",
+            "action": "*",
+            "resource": "*"
+        },
+        {
+            "type": "user",
+            "name": "admin-user",
+            "privileged": true,
+            "mfa_enabled": false
+        },
+        {
+            "type": "access_key",
+            "name": "old-access-key",
+            "last_used_days": 120
+        }
+    ]
+}

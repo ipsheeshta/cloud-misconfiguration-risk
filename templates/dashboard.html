@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Cloud Security Dashboard</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+    <div class="container">
+
+        <h1>Cloud Security Dashboard</h1>
+
+        <p class="subtitle">
+             Automated Cloud Misconfiguration Detection & Risk Prioritization
+        </p>
+        
+        <div class="scan-info">
+            {% if scan %}
+              <span>Latest Scan: #{{ scan.id }}</span>
+              <span>{{ scan.started_at }}</span>
+            {% else %}
+              <span>No scans available</span>
+            {% endif %}
+
+        </div>
+        
+        <form action="{{ url_for('run_new_scan') }}" method="POST">
+            <button type="submit" class="scan-button">
+                🔍 Run New Scan
+            </button>
+        </form>
+        
+
+        <div class="summary">
+            
+            <div class="card total">
+               <h3>Total Findings</h3>
+               <p>{{ findings | length }}</p>
+            </div>
+
+            <div class="card critical">
+                <h3>Critical</h3>
+                <p>
+                    {{ findings | selectattr("priority", "equalto", "CRITICAL") | list | length }}
+                </p>
+            </div>
+
+            <div class="card high">
+                <h3>High</h3>
+                <p>
+                    {{ findings | selectattr("priority", "equalto", "HIGH") | list | length }}
+                </p>
+            </div>
+
+            <div class="card medium">
+                <h3>Medium</h3>
+                <p>
+                    {{ findings | selectattr("priority", "equalto", "MEDIUM") | list | length }}
+                </p>
+            </div>
+
+            <div class="card low">
+                <h3>Low</h3>
+                <p>
+                    {{ findings | selectattr("priority", "equalto", "LOW") | list | length }}
+                </p>
+            </div>
+
+        </div>
+
+        <h2>Findings by Service</h2>
+
+        <div class="service-summary">
+
+            <div class="service-card">
+              <h3>Security Groups</h3>
+              <p>{{ service_counts["Security Groups"] }}</p>
+            </div>
+
+            <div class="service-card">
+              <h3>S3</h3>
+              <p>{{ service_counts["S3"] }}</p>
+            </div>
+
+            <div class="service-card">
+             <h3>IAM</h3>
+             <p>{{ service_counts["IAM"] }}</p>
+            </div>
+
+        </div>
+
+        <h2>Security Findings</h2>
+
+        <table>
+
+            <thead>
+                <tr>
+                    <th>Priority</th>
+                    <th>Risk Score</th>
+                    <th>Rule</th>
+                    <th>Resource</th>
+                    <th>Finding</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {% for finding in findings %}
+
+                <tr>
+
+                    <td>
+                        <span class="priority {{ finding.priority | lower }}">
+                            {{ finding.priority }}
+                        </span>
+                    </td>
+
+                    <td>
+                        {{ finding.risk_score }}
+                    </td>
+
+                    <td>
+                        {{ finding.rule_id }}
+                    </td>
+
+                    <td>
+                        {{ finding.resource_name }}
+                    </td>
+
+                    <td>
+                        {{ finding.title }}
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</body>
+</html>

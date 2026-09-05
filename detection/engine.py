@@ -11,21 +11,34 @@ from detection.rules import (
 )
 
 
+def add_resource_context(finding, resource):
+    """Attach service and resource information to a finding."""
+
+    result = finding.copy()
+
+    result["resource_id"] = resource.get("id")
+    result["resource_name"] = resource.get("name")
+    
+    return result
+
+
 def scan_security_groups(security_groups):
     findings = []
 
-    for rule in security_groups:
-        detectors = [
-            detect_ssh_open_to_internet,
-            detect_rdp_open_to_internet,
-            detect_unrestricted_inbound_port
-        ]
+    detectors = [
+        detect_ssh_open_to_internet,
+        detect_rdp_open_to_internet,
+        detect_unrestricted_inbound_port
+    ]
 
+    for rule in security_groups:
         for detector in detectors:
             finding = detector(rule)
 
             if finding:
-                findings.append(finding)
+                findings.append(
+                    add_resource_context(finding, rule)
+                )
 
     return findings
 
@@ -33,18 +46,20 @@ def scan_security_groups(security_groups):
 def scan_s3(buckets):
     findings = []
 
-    for bucket in buckets:
-        detectors = [
-            detect_public_s3_bucket,
-            detect_public_s3_objects,
-            detect_s3_encryption_disabled
-        ]
+    detectors = [
+        detect_public_s3_bucket,
+        detect_public_s3_objects,
+        detect_s3_encryption_disabled
+    ]
 
+    for bucket in buckets:
         for detector in detectors:
             finding = detector(bucket)
 
             if finding:
-                findings.append(finding)
+                findings.append(
+                    add_resource_context(finding, bucket)
+                )
 
     return findings
 
@@ -68,6 +83,8 @@ def scan_iam(resources):
             finding = None
 
         if finding:
-            findings.append(finding)
+            findings.append(
+                add_resource_context(finding, resource)
+            )
 
     return findings
