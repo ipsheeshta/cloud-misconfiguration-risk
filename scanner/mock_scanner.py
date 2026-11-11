@@ -1,4 +1,4 @@
-import json
+from .config_loader import load_config
 from database.db import (initialize_database, create_scan, save_finding)
 
 from detection.engine import (
@@ -8,13 +8,6 @@ from detection.engine import (
 )
 
 from risk.prioritizer import prioritize_findings
-
-
-def load_config(file_path):
-    """Load simulated AWS configuration from a JSON file."""
-
-    with open(file_path, "r") as file:
-        return json.load(file)
 
 
 def run_scan(file_path):
